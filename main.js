@@ -24,17 +24,41 @@ function updateTimerUI() {
 }
 
 async function handleRegisterSubmit(e) {
-    if (registered || expiredTriggered) return;
-    expiredTriggered = true;
-
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
+    e.preventDefault();
+    if (expiredTriggered) {
+        alert("El tiempo de registro ya expiró. No puedes registrarte.");
+        return;
+    }
+    if (registered) {
+        alert("Ya estás registrado en el Hackathon. ¡Nos vemos!");
+        return;
     }
 
-    if (activeFormContainer) activeFormContainer.classList.add('hidden');
-    if (expiredMessageDiv) expiredMessageDiv.classList.remove('hidden');
-    if (successMessageDiv) successMessageDiv.classList.add('hidden');
+    const nombre = nombreInput.value.trim();
+    const correo = correoInput.value.trim();
+    const mensaje = mensajeInput.value.trim();
+
+    if (nombre === "") { alert("Por favor, ingresa tu nombre completo."); return; }
+    if (correo === "") { alert("El correo electrónico es obligatorio."); return; }
+    const emailRegex = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
+    if (!emailRegex.test(correo)) { alert("Ingresa un correo electrónico válido."); return; }
+    if (mensaje === "") { alert("Escribe un breve mensaje."); return; }
+
+    try {
+        const res = await fetch('https://prueba-production-5619.up.railway.app/api/registro', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre, correo, mensaje })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            registerSuccess();
+        } else {
+            alert(data.error || 'Error al registrar');
+        }
+    } catch (err) {
+        alert('No se pudo conectar con el servidor');
+    }
 }
 
 function startCountdown() {
@@ -75,57 +99,7 @@ function registerSuccess() {
     if (expiredMessageDiv) expiredMessageDiv.classList.add('hidden');
 }
 
-function handleRegisterSubmit(e) {
-    e.preventDefault();
-    if (expiredTriggered) {
-        alert("El tiempo de registro ya expiró. No puedes registrarte.");
-        return;
-    }
-    if (registered) {
-        alert("Ya estás registrado en el Hackathon. ¡Nos vemos!");
-        return;
-    }
 
-    const nombre = nombreInput.value.trim();
-    const correo = correoInput.value.trim();
-    const mensaje = mensajeInput.value.trim();
-
-    if (nombre === "") {
-        alert("Por favor, ingresa tu nombre completo.");
-        return;
-    }
-    if (correo === "") {
-        alert("El correo electrónico es obligatorio.");
-        return;
-    }
-    const emailRegex = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
-    if (!emailRegex.test(correo)) {
-        alert("Ingresa un correo electrónico válido (ejemplo: nombre@dominio.com).");
-        return;
-    }
-    if (mensaje === "") {
-        alert("Escribe un breve mensaje o cuéntanos tu motivación.");
-        return;
-    }
-    //bd
-    try {
-        const res = await fetch('https://https://prueba-production-5619.up.railway.app/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, correo, mensaje })
-        });
-    
-        const data = await res.json();
-    
-        if (res.ok) {
-            registerSuccess(); // ahora solo se llama si el backend dijo que sí
-        } else {
-            alert(data.error || 'Error al registrar');
-        }
-    } catch (err) {
-        alert('No se pudo conectar con el servidor');
-    }
-}
 
 if (registerForm) {
     registerForm.addEventListener('submit', handleRegisterSubmit);
