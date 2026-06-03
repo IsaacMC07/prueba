@@ -109,7 +109,7 @@ function handleRegisterSubmit(e) {
     }
     //bd
     try {
-        const res = await fetch('https://tu-backend.railway.app/api/registro', {
+        const res = await fetch('https://https://prueba-production-5619.up.railway.app/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nombre, correo, mensaje })
