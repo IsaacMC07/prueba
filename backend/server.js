@@ -55,4 +55,5 @@ app.get('/api/registros', async (req, res) => {
 });
 
 initDB();
-app.listen(3000, () => console.log('Backend corriendo en puerto 3000'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORTgit add ., () => console.log(`Backend corriendo en puerto ${PORT}`));
